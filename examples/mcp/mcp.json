@@ -1,0 +1,70 @@
+{
+    "mcpServers": {
+        "browser-tools": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@agentdeskai/browser-tools-mcp@1.2.0"
+            ]
+        },
+        "brave-search": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-brave-search"
+            ],
+            "env": {
+                "BRAVE_API_KEY": "your_brave_api_key"
+            }
+        },
+        "puppeteer": {
+            "command": "npx",
+            "args": [
+                "@modelcontextprotocol/server-puppeteer"
+            ]
+        },
+        "filesystem": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-filesystem",
+                "/home/bachle/Projects"
+            ]
+        },
+        "github": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-github"
+            ],
+            "env": {
+                "GITHUB_PERSONAL_ACCESS_TOKEN": "your_github_token"
+            }
+        },
+        "dbhub-postgres-npx": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@bytebase/dbhub",
+                "--transport",
+                "stdio",
+                "--dsn",
+                "postgres://user:password@localhost:5432/dbname?sslmode=disable"
+            ]
+        },
+        "mcp_server_mysql": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@benborla29/mcp-server-mysql"
+            ],
+            "env": {
+                "MYSQL_HOST": "127.0.0.1",
+                "MYSQL_PORT": "3306",
+                "MYSQL_USER": "your_mysql_username",
+                "MYSQL_PASS": "your_mysql_password",
+                "MYSQL_DB": "your_mysql_database"
+            }
+        }
+    }
+}

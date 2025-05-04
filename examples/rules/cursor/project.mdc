@@ -1,0 +1,52 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+### Project Awareness & Context
+
+- **Thoroughly review `docs/planning/ROADMAP.md` and `docs/planning/DESIGN.md`** at the beginning of each new conversation to understand the project's architecture, objectives, guidelines, and constraints.
+- **Consult `docs/planning/TASKS` before starting any task.** If the task is not listed, document it promptly with a clear description and the current date by MCP time
+- **Adhere to the established naming conventions, file structures, and architectural patterns** defined in `docs/planning/DESIGN.md` for consistency and maintainability.
+
+### Code Structure & Modularity
+
+- **Maintain file sizes under 500 lines of code.** When approaching this limit, refactor by segmenting the code into smaller, reusable modules or helper files.
+- **Structure code into well-defined modules** following Chrome extension architecture (popup, background, content scripts) for clarity and maintainability.
+- **Ensure clarity and consistency in import statements,** favoring ES modules where applicable for modern JavaScript.
+
+### Testing & Reliability
+
+- **Implement Jest unit tests for all new features** including functions, components, and services.
+- **When modifying existing logic,** review and update related unit tests to maintain test coverage and reliability.
+- **Place all tests in the `/tests` directory,** reflecting the structure of the main extension.
+  - Each new feature should include:
+    - At least one test for the expected (happy path) scenario.
+    - At least one test for an edge case.
+    - At least one test for a failure case to validate error handling.
+
+### Task Completion
+
+- **Update `docs/planning/TASKS` immediately upon task completion** to maintain accurate tracking.
+- **Document any new sub-tasks or findings during development** under a dedicated section in `docs/planning/TASKS` (e.g., "Discovered During Work") to ensure full visibility.
+
+### Style & Conventions
+
+- **Use Bash/Shell scripting** as the primary development language for the tool.
+- **Follow POSIX-compliant shell scripting** for maximum compatibility across Linux distributions.
+- **Implement function-based modularity** with clear function naming using the `pai_` prefix for all functions.
+- **Organize code into logical modules** in the `/lib` directory for better maintainability.
+- **Use descriptive variable names** with CAPITAL_SNAKE_CASE for constants and lowercase_snake_case for regular variables.
+- **Include proper error handling** with meaningful error messages and appropriate exit codes.
+- **Document every function with clear comments.** Example:
+  ```bash
+  # Check if a command exists
+  # 
+  # @param $1 The command to check
+  # @returns 0 if the command exists, 1 otherwise
+  pai_command_exists() {
+    command -v "$1" >/dev/null 2>&1
+  }
+  ```
+- **Implement consistent logging** using the established pai_log, pai_info, pai_error, and pai_warn functions.
+- **Set proper script safeguards** like `set -e` at the beginning of scripts to fail fast on errors.

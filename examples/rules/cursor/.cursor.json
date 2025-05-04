@@ -1,0 +1,8 @@
+{
+    "rules": [
+      {
+        "pattern": "^php artisan (.*)$",
+        "replacement": "docker exec -it app_php_81 bash -c 'cd /var/www/practice/laravel/test-laravel-10 && php artisan $1'"
+      }
+    ]
+}
