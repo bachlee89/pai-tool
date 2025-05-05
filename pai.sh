@@ -196,10 +196,10 @@ pai_help() {
         echo "  pai help prompts   Display help for the 'prompts' command"
         ;;
       *)
-        pai_error "Unknown command: $command"
+        pai_warn "Unknown command: $command"
         echo ""
         pai_help
-        return 1
+        return 0
         ;;
     esac
     
@@ -756,62 +756,127 @@ pai_uninstall() {
 
 # Main function to parse commands
 pai_main() {
+  # Save the current settings of shell options
+  local saved_options=$(set +o)
+  
+  # Disable exit on error for this function
+  set +e
+  set +o pipefail
+  set +o nounset
+  
   # Parse command line arguments
   if [ $# -eq 0 ]; then
     pai_help
+    # Restore previous options before returning
+    eval "$saved_options"
     return 0
   fi
 
+  local result=0
+  
   # Process commands
   case "$1" in
     init)
       shift
-      pai_init "$@"
+      pai_init "$@" || {
+        result=1
+        pai_warn "Init command failed, but your terminal will remain open"
+      }
       ;;
     prompts)
-      pai_prompts
+      pai_prompts || {
+        result=1
+        pai_warn "Prompts command failed, but your terminal will remain open"
+      }
       ;;
     plan)
-      pai_plan
+      pai_plan || {
+        result=1
+        pai_warn "Plan command failed, but your terminal will remain open"
+      }
       ;;
     mcp)
       shift
-      pai_mcp "$@"
+      pai_mcp "$@" || {
+        result=1
+        pai_warn "MCP command failed, but your terminal will remain open"
+      }
       ;;
     version)
       shift
-      pai_version "$@"
+      pai_version "$@" || {
+        result=1
+        pai_warn "Version command failed, but your terminal will remain open"
+      }
       ;;
     upgrade)
-      pai_upgrade
+      pai_upgrade || {
+        result=1
+        pai_warn "Upgrade command failed, but your terminal will remain open"
+      }
       ;;
     uninstall)
-      pai_uninstall
+      pai_uninstall || {
+        result=1
+        pai_warn "Uninstall command failed, but your terminal will remain open"
+      }
       ;;
     help)
       shift
-      pai_help "$@"
+      pai_help "$@" || {
+        result=1
+        pai_warn "Help command failed, but your terminal will remain open"
+      }
       ;;
     *)
-      echo "Error: Unknown command '$1'"
+      pai_error "Unknown command: $1"
       pai_help
-      return 1
+      result=1
       ;;
   esac
 
-  return 0
+  # Restore previous options before returning
+  eval "$saved_options"
+  return $result
 }
 
 # Only run the main function if the script is executed, not sourced
 if [ $sourced -eq 0 ]; then
+  # When run directly, exit with the return value
   pai_main "$@"
   exit $?
 else
-  # When sourced, export the function so it can be called directly
+  # When sourced, export the function but trap errors to prevent terminal closure
   export -f pai_main
+  
   # Define the pai function for sourced usage
   pai() {
+    # Save the current setting of 'e' flag
+    local e_flag_set=0
+    if [[ $- == *e* ]]; then
+      e_flag_set=1
+      set +e  # Disable exit on error temporarily
+    fi
+    
+    # Run the main function
     pai_main "$@"
-    return $?
+    local result=$?
+    
+    # Restore the 'e' flag if it was previously set
+    if [ $e_flag_set -eq 1 ]; then
+      set -e
+    fi
+    
+    # Return the result without exiting
+    return $result
   }
+  
+  # Also export utility functions for use in pai_main
+  export -f pai_error
+  export -f pai_warn
+  export -f pai_info
+  export -f pai_ensure_dir
+  
+  # Export the pai function to be available in the shell
+  export -f pai
 fi
