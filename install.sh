@@ -66,7 +66,7 @@ update_shell_config() {
   local config_line="export PATH=\"\$PATH:\$HOME/.pai\""
   # Use alias to safely run PAI commands when sourced
   local source_line="[ -s \"\$HOME/.pai/pai.sh\" ] && source \"\$HOME/.pai/pai.sh\" # This loads PAI Tool without closing terminal"
-  local alias_line="alias pai='pai_main'"
+  local alias_line="alias pai=\"\$HOME/.pai/pai.sh\""
   
   for profile in "${PAI_PROFILES[@]}"; do
     if [ -f "$profile" ]; then
@@ -90,7 +90,7 @@ update_shell_config() {
       fi
       
       # Add pai alias if missing
-      if ! grep -q "alias pai='pai_main'" "$profile"; then
+      if ! grep -q "alias pai='.*pai.sh'" "$profile"; then
         print_message "Adding PAI alias in $profile"
         echo "$alias_line" >> "$profile"
       fi
