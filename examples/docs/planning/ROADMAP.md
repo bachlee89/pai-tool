@@ -1,55 +1,55 @@
-# PAI Tool Roadmap
-
 ## Vision
-Create a user-friendly command-line tool that streamlines project initialization and management by providing standardized templates, configurations, and workflows.
+Create a Chrome extension that empowers content creators to effortlessly generate similar tweet ideas based on selected tweets, personalized to their content style and audience.
 
 ## Strategic Direction
 
-```mermaid
-graph TD
-    A[Initial Release: v0.1.0] -->|Core functionality| B[v0.2.0: Template Expansion]
-    B -->|Enhanced templates| C[v0.3.0: Configuration Management]
-    C -->|Robust configurations| D[v0.4.0: Plugin System]
-    D -->|Extensibility| E[v1.0.0: Stable Release]
-    
-    style A fill:#d4f1f9,stroke:#333,stroke-width:2px
-    style B fill:#d4f1f9,stroke:#333,stroke-width:1px
-    style C fill:#d4f1f9,stroke:#333,stroke-width:1px
-    style D fill:#d4f1f9,stroke:#333,stroke-width:1px
-    style E fill:#d4e9c2,stroke:#333,stroke-width:2px
-    
+```
+Phase 1: MVP Launch (1-2 months)
+├── Core Functionality
+│   ├── Tweet selection & extraction
+│   ├── Basic idea generation
+│   ├── Simple configuration
+│   └── Copy to clipboard
+│
+Phase 2: Enhancement (2-3 months)
+├── Advanced Features
+│   ├── Customization options
+│   ├── Analytics integration
+│   ├── Style templates
+│   └── Batch processing
+│
+Phase 3: Growth & Integration (3-4 months)
+├── Ecosystem Development
+│   ├── Direct posting integration
+│   ├── Content calendar integration
+│   ├── Premium features
+│   └── API improvements
 ```
 
-## Milestones
+## Key Milestones
 
-### v0.1.0 (MVP)
-- Core command structure (`pai init`, `pai version`, etc.)
-- Basic template initialization
-- Documentation for basic usage
+1. **Prototype Development** (2 weeks)
+   - Basic extension structure
+   - Context menu integration
+   - Simple UI for displaying results
 
-### v0.2.0
-- Expanded template library
-- Custom template support
-- Template versioning
+2. **Core Feature Implementation** (1 month)
+   - Text extraction functionality
+   - Integration with NLP/AI API
+   - User configuration storage
 
-### v0.3.0
-- Advanced configuration management
-- User preferences
-- Project-specific configurations
+3. **MVP Release** (1-2 months)
+   - User testing
+   - Bug fixes
+   - Chrome Web Store submission
 
-### v0.4.0
-- Plugin system for extensibility
-- Community contributions framework
-- API for third-party integrations
-
-### v1.0.0
-- Full test coverage
-- Comprehensive documentation
-- Performance optimizations
-- Stable API
+4. **Continuous Improvement**
+   - User feedback collection
+   - Feature prioritization
+   - Regular updates
 
 ## Success Metrics
-- User adoption rate
-- Time saved during project initialization
-- Number of community contributions
-- User satisfaction ratings
+- Number of active users
+- Average ideas generated per session
+- User retention rate
+- Positive reviews and ratings

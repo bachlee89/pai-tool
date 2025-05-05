@@ -1,111 +1,109 @@
-# PAI Tool Structure Document
+## Project Overview
+A Chrome extension that allows users to select an existing tweet, trigger the extension via context menu, and receive 10 similar tweet ideas based on pre-configured content style and audience preferences.
 
-## Overview
-PAI (Project AI) Tool is a shell-based command-line utility designed to streamline project initialization and management workflows. Similar to nvm (Node Version Manager), PAI provides an intuitive CLI interface for managing project resources, configurations, and templates.
+## Problem Statement
+Content creators struggle with consistently generating fresh tweet ideas that maintain their voice and resonate with their audience. Manual brainstorming is time-consuming and often results in creative blocks.
 
-## Goals
-1. Create a lightweight, POSIX-compliant shell tool that works across Linux distributions
-2. Provide a simple interface for initializing projects with standardized templates
-3. Enable easy management of project configurations
-4. Support self-updating capabilities
-5. Maintain comprehensive documentation
+## Solution
+Our extension will:
+1. Allow selection of any tweet text on Twitter
+2. Process the selected content through NLP/AI to understand context, tone, and structure
+3. Generate 10 unique but similar ideas tailored to the user's predefined content style and audience
+4. Present these ideas in a clean, usable format for immediate use or saving
 
 ## Scope
 
-### In Scope
-- Shell-based command-line tool
-- Project initialization with templates
-- Configuration management
-- Self-updating mechanism
-- Comprehensive documentation
+### MVP Features (Must-Have)
+- Context menu integration for tweet selection
+- Simple configuration page for profile setup (content style, audience)
+- Integration with AI text generation API
+- Generation of 10 similar tweet ideas
+- Basic UI for displaying results
+- Copy functionality for generated ideas
 
-### Out of Scope (for MVP)
-- GUI interface
-- Integration with external services (beyond GitHub)
-- Advanced plugin architecture (planned for future)
-- Cross-platform support beyond POSIX-compliant systems
+### Future Enhancements (Nice-to-Have)
+- Direct posting to Twitter
+- Saved ideas library
+- Custom templates
+- Analytics on idea performance
+- Batch processing of multiple tweets
+- Style variation controls
 
 ## Technical Approach
 
-### Implementation
-- Primary implementation in Bash/Shell script for maximum compatibility
-- Minimal dependencies (curl, git, standard Unix tools)
-- Configuration stored in JSON format
-- Self-contained installation and updating process
+### Extension Structure
+- **Background Script**: Handles context menu creation, API communication
+- **Content Script**: Extracts selected tweet text, injects UI elements
+- **Popup**: User configuration and settings
+- **Options Page**: Detailed settings and preferences
 
-### Directory Structure
-```
-pai-tool/
-├── pai.sh             # Main script file
-├── install.sh         # Installation script
-├── lib/               # Helper functions and modules
-│   └── utils.sh       # Utility functions
-├── docs/              # Documentation
-│   └── planning/      # Project planning documents
-│       ├── ROADMAP.md # Project roadmap and future plans
-│       ├── DESIGN.md # Project design document
-│       └── TASKS      # Current tasks and progress tracking
-├── examples/          # Example files and templates
-│   ├── prompts/       # AI prompt templates
-│   │   └── TEMPLATES.md # Example prompts for AI assistants
-│   └── rules/         # AI assistant rules
-│       ├── cursor/    # Rules for Cursor IDE
-│       │   └── project.md # Project-specific rules
-│       └── windsurf/  # Rules for Windsurf AI
-└── .cursor/           # Cursor IDE configuration
-    └── rules/         # Cursor IDE rules
-        ├── general-rules.mdc # General project rules
-        └── devops-rules.mdc  # DevOps specific rules
-```
+### Technologies
+- **Frontend**: HTML, CSS, JavaScript
+- **API Integration**: OpenAI API or similar NLP service
+- **Storage**: Chrome Extension Storage API for user preferences
+- **UI Framework**: Lightweight framework like Alpine.js or vanilla JS
+- **Authentication**: Simple API key storage for third-party services
 
-### Installation Method
-Similar to nvm, PAI will be installed via a curl or wget command that downloads and executes an installation script:
+### API Requirements
+We'll need an NLP/AI service that can:
+- Analyze tweet content and structure
+- Generate similar content with variations
+- Maintain consistent tone and style
+- Handle user-specific context
 
-```bash
-curl -o- https://raw.githubusercontent.com/bachlee89/pai-tool/main/install.sh | bash
-```
+Options include:
+- OpenAI API (GPT models)
+- Cohere
+- Anthropic's Claude
+- HuggingFace's inference API
 
-or
+### Data Flow
+1. User selects tweet text and triggers extension
+2. Extension captures text and metadata
+3. Background script sends data to AI API with user preferences
+4. API returns generated ideas
+5. Extension displays ideas in popup UI
+6. User can copy, save, or post ideas
 
-```bash
-wget -qO- https://raw.githubusercontent.com/bachlee89/pai-tool/main/install.sh | bash
-```
+## User Experience
 
-The installation script will:
-1. Clone or download the repository
-2. Set up necessary directories
-3. Add PATH and initialization to shell configuration files (.bashrc, .zshrc, etc.)
-4. Create initial configuration files
+### User Flow
+1. Install extension
+2. Configure profile (content style, audience, preferences)
+3. Browse Twitter
+4. Select interesting tweet
+5. Right-click and select \"Generate Similar Ideas\"
+6. View generated ideas in popup
+7. Copy preferred ideas for use
 
-### Command Architecture
-Commands will be implemented using a modular approach:
-- Main script (pai.sh) parses arguments and dispatches to appropriate handler
-- Each command is implemented in a separate function or file
-- Common utilities are shared across commands
+### Interface Design Principles
+- Clean, minimal interface
+- Twitter-like styling for familiarity
+- Clear categorization of generated ideas
+- Easy copying and saving functionality
+- Unobtrusive integration with Twitter
 
-## Technology Stack
-- Bash/Shell scripting
-- JSON for configuration files
-- Git for version control and updates
-- curl/wget for network operations
-- Standard Unix tools (sed, awk, grep, etc.)
+## Development Resources
+- Chrome Extension Documentation
+- Context Menus API
+- Twitter's page structure
+- NLP/AI API documentation
 
-## Versioning Strategy
-- Semantic versioning (MAJOR.MINOR.PATCH)
-- Version stored in a dedicated version file
-- Version check for update functionality
+## Privacy & Security Considerations
+- All user data stored locally when possible
+- Secure handling of API keys
+- Clear permissions requirements
+- No unnecessary data collection
+- Compliance with Twitter's terms of service
 
-## Testing Strategy
-- Shell script testing with BATS (Bash Automated Testing System)
-- Integration tests for key workflows
-- Manual testing across different environments
+## Business Model Options
+- Freemium model (basic features free, advanced features paid)
+- API usage limits for free tier
+- Subscription for unlimited generations
+- One-time purchase option
 
-## Documentation Strategy
-- README.md for quick start and basic usage
-- docs/planning/ROADMAP.md for strategic direction
-- docs/planning/DESIGN.md for high-level approach and project structure
-- docs/planning/TASK for immediate action items and progress tracking
-- examples/prompts/TEMPLATES.md for AI prompt examples and templates
-- examples/rules/ directory for AI assistant rules and configurations
-  - examples/rules/cursor/ for Cursor IDE specific rules
-  - examples/rules/windsurf/ for Windsurf AI specific rules
+## Success Criteria
+- Extension successfully generates relevant, usable tweet ideas
+- User feedback indicates time saved in content creation
+- Low friction in the selection and generation process
+- High rate of generated ideas actually being used
