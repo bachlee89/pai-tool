@@ -64,7 +64,8 @@ update_shell_config() {
   print_message "Updating shell configuration..."
   
   local config_line="export PATH=\"\$PATH:\$HOME/.pai\""
-  local source_line="[ -s \"\$HOME/.pai/pai.sh\" ] && \\. \"\$HOME/.pai/pai.sh\" # This loads PAI Tool"
+  # Better sourcing approach that prevents terminal closure
+  local source_line="[ -s \"\$HOME/.pai/pai.sh\" ] && source \"\$HOME/.pai/pai.sh\" # This loads PAI Tool without closing terminal"
   
   for profile in "${PAI_PROFILES[@]}"; do
     if [ -f "$profile" ]; then
@@ -74,7 +75,15 @@ update_shell_config() {
         echo "$config_line" >> "$profile"
       fi
       
-      if ! grep -q "\[ -s.*\.pai/pai.sh" "$profile"; then
+      # Remove old sourcing if exists
+      if grep -q "\[ -s.*\.pai/pai.sh" "$profile"; then
+        print_message "Updating PAI source in $profile"
+        grep -v "\[ -s.*\.pai/pai.sh" "$profile" > "$profile.tmp"
+        mv "$profile.tmp" "$profile"
+      fi
+      
+      # Add new sourcing method
+      if ! grep -q "source.*\.pai/pai.sh" "$profile"; then
         print_message "Adding PAI source in $profile"
         echo "$source_line" >> "$profile"
       fi
