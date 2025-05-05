@@ -759,12 +759,7 @@ pai_main() {
   # Parse command line arguments
   if [ $# -eq 0 ]; then
     pai_help
-    # Use return when sourced, exit when executed directly
-    if [ $sourced -eq 1 ]; then
-      return 0
-    else
-      exit 0
-    fi
+    return 0
   fi
 
   # Process commands
@@ -800,24 +795,23 @@ pai_main() {
     *)
       echo "Error: Unknown command '$1'"
       pai_help
-      # Use return when sourced, exit when executed directly
-      if [ $sourced -eq 1 ]; then
-        return 1
-      else
-        exit 1
-      fi
+      return 1
       ;;
   esac
 
-  # Use return when sourced, exit when executed directly
-  if [ $sourced -eq 1 ]; then
-    return 0
-  else
-    exit 0
-  fi
+  return 0
 }
 
 # Only run the main function if the script is executed, not sourced
 if [ $sourced -eq 0 ]; then
   pai_main "$@"
+  exit $?
+else
+  # When sourced, export the function so it can be called directly
+  export -f pai_main
+  # Define the pai function for sourced usage
+  pai() {
+    pai_main "$@"
+    return $?
+  }
 fi

@@ -64,8 +64,9 @@ update_shell_config() {
   print_message "Updating shell configuration..."
   
   local config_line="export PATH=\"\$PATH:\$HOME/.pai\""
-  # Better sourcing approach that prevents terminal closure
+  # Use alias to safely run PAI commands when sourced
   local source_line="[ -s \"\$HOME/.pai/pai.sh\" ] && source \"\$HOME/.pai/pai.sh\" # This loads PAI Tool without closing terminal"
+  local alias_line="alias pai='pai_main'"
   
   for profile in "${PAI_PROFILES[@]}"; do
     if [ -f "$profile" ]; then
@@ -76,7 +77,7 @@ update_shell_config() {
       fi
       
       # Remove old sourcing if exists
-      if grep -q "\[ -s.*\.pai/pai.sh" "$profile"; then
+      if grep -q "\[ -s.*\.pai/pai.sh" "$profile" && ! grep -q "source.*\.pai/pai.sh.*without closing terminal" "$profile"; then
         print_message "Updating PAI source in $profile"
         grep -v "\[ -s.*\.pai/pai.sh" "$profile" > "$profile.tmp"
         mv "$profile.tmp" "$profile"
@@ -86,6 +87,12 @@ update_shell_config() {
       if ! grep -q "source.*\.pai/pai.sh" "$profile"; then
         print_message "Adding PAI source in $profile"
         echo "$source_line" >> "$profile"
+      fi
+      
+      # Add pai alias if missing
+      if ! grep -q "alias pai='pai_main'" "$profile"; then
+        print_message "Adding PAI alias in $profile"
+        echo "$alias_line" >> "$profile"
       fi
     fi
   done
