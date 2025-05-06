@@ -1,0 +1,6 @@
+---
+description: Auto Debug and Fix issue with Browser Tools MCP
+globs: 
+alwaysApply: false
+---
+When I say /debug, gather console logs and take a screenshot of app to help fix issue.
