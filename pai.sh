@@ -639,9 +639,9 @@ pai_version() {
   echo "╔════════════════════════════════════════╗"
   echo "║             PAI Tool Info              ║"
   echo "╚════════════════════════════════════════╝"
-  echo " Version:      $current_version" | awk '{printf "%-36s\n", $0}' | sed 's/$/║/'
-  echo " Install Path: $PAI_DIR" | awk '{printf "%-36s\n", $0}' | sed 's/$/║/'
-  echo " Last Updated: $(date -r "$PAI_DIR/pai.sh" "+%Y-%m-%d %H:%M:%S")" | awk '{printf "%-36s\n", $0}' | sed 's/$/║/'
+  echo " Version:      $current_version" | awk '{printf "%-36s\n", $0}' | sed 's/$//'
+  echo " Install Path: $PAI_DIR" | awk '{printf "%-36s\n", $0}' | sed 's/$//'
+  echo " Last Updated: $(date -r "$PAI_DIR/pai.sh" "+%Y-%m-%d %H:%M:%S")" | awk '{printf "%-36s\n", $0}' | sed 's/$//'
   
   # Check for updates if requested
   if $check_update; then
