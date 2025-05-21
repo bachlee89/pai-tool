@@ -1,7 +1,7 @@
 # PAI Tool (Project AI Tooling)
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/bachlee89/pai-tool/blob/main/LICENSE)
-[![Version](https://img.shields.io/badge/version-0.1.0-green.svg)](https://github.com/bachlee89/pai-tool/releases)
+[![Version](https://img.shields.io/badge/version-0.1.1-green.svg)](https://github.com/bachlee89/pai-tool/releases)
 
 PAI (Project AI Tooling) is a shell-based command-line utility designed to streamline AI-driven project initialization and management workflows. It provides an intuitive CLI interface for managing project resources, configurations, and templates, with a focus on AI assistant integration.
 

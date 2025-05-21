@@ -130,11 +130,21 @@ pai_check_version() {
   pai_info "Current version: $current_version"
   pai_info "Checking for updates..."
   
-  # Implementation will pull latest version from GitHub
-  # latest_version=$(curl -sSL https://raw.githubusercontent.com/yourusername/pai-tool/main/VERSION)
+  # Get latest version from GitHub repository
+  if pai_command_exists curl; then
+    latest_version=$(curl -sSL https://raw.githubusercontent.com/bachlee89/pai-tool/main/pai.sh | grep "PAI_VERSION=" | head -n 1 | cut -d'"' -f2)
+  elif pai_command_exists wget; then
+    latest_version=$(wget -qO- https://raw.githubusercontent.com/bachlee89/pai-tool/main/pai.sh | grep "PAI_VERSION=" | head -n 1 | cut -d'"' -f2)
+  else
+    pai_warn "Cannot check for updates: Neither curl nor wget found"
+    latest_version="$current_version" # Fall back to current version
+  fi
   
-  # Temporary placeholder
-  latest_version="$current_version"
+  # Validate the version string
+  if [ -z "$latest_version" ]; then
+    pai_warn "Unable to determine latest version, using current version"
+    latest_version="$current_version"
+  fi
   
   if [ "$current_version" != "$latest_version" ]; then
     pai_info "New version available: $latest_version"
