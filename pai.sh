@@ -19,7 +19,7 @@ fi
 export PAI_SOURCED=1
 
 # Variables
-PAI_VERSION="0.1.0"
+PAI_VERSION="0.1.1"
 # Determine the actual script location, resolving symlinks
 PAI_SCRIPT="${BASH_SOURCE[0]}"
 if [ -L "$PAI_SCRIPT" ]; then
