@@ -101,6 +101,12 @@ pai_main() {
         result=1
       fi
       ;;
+    statistics)
+      if ! pai_statistics; then
+        pai_error "Statistics command failed, but your terminal will remain open"
+        result=1
+      fi
+      ;;
     help)
       shift
       if ! pai_help "$@"; then
@@ -256,6 +262,25 @@ pai_help() {
         echo "  - You will be prompted for confirmation before uninstallation"
         echo "  - This action cannot be undone, but you can reinstall using the install script"
         ;;
+      statistics)
+        echo "PAI Tool - Project Statistics"
+        echo ""
+        echo "Usage: pai statistics"
+        echo ""
+        echo "Description:"
+        echo "  Analyzes the current project to provide statistics on:"
+        echo "  - Total lines of code in the project"
+        echo "  - Number of lines created by AI (based on REF-PR-* references)"
+        echo "  - Percentage of code created by AI"
+        echo ""
+        echo "Examples:"
+        echo "  pai statistics    Show code statistics for the current project"
+        echo ""
+        echo "Notes:"
+        echo "  - Uses .paiignore file (if present) to exclude directories/files"
+        echo "  - Automatically ignores common directories like node_modules, vendor, etc."
+        echo "  - Only counts code files (excludes binaries, images, etc.)"
+        ;;
       help)
         echo "PAI Tool - Help"
         echo ""
@@ -299,6 +324,7 @@ pai_help() {
   echo "  version [-c]       Display current version and check for updates"
   echo "  upgrade            Update PAI to the latest version"
   echo "  uninstall          Remove PAI Tool from your system"
+  echo "  statistics         Show code statistics with AI contribution metrics"
   echo "  help [command]     Display help for a specific command"
   echo ""
   echo "Examples:"
@@ -829,9 +855,214 @@ pai_uninstall() {
   return 0
 }
 
-# Only run the main function if the script is executed or sourced
+# Command: pai statistics
+pai_statistics() {
+  local current_dir="$(pwd)"
+  local ignore_file="$current_dir/.paiignore"
+  local total_lines=0
+  local ai_lines=0
+  local percentage=0
+  local find_excludes=""
+  
+  pai_info "Analyzing project code statistics..."
+  
+  # Default directories to ignore
+  local default_ignores=(
+    "node_modules"
+    "vendor"
+    ".git"
+    "storage/framework"
+    "bootstrap/cache"
+    "public/storage"
+    "public/build"
+    "public/hot"
+    "dist"
+    "build"
+    ".next"
+    ".nuxt"
+    "_output"
+    "bin"
+    "obj"
+    "target"
+  )
+  
+  # Create find excludes for default ignores
+  for dir in "${default_ignores[@]}"; do
+    find_excludes="$find_excludes -not -path \"*/$dir/*\""
+  done
+  
+  # Add custom ignores from .paiignore if it exists
+  if [ -f "$ignore_file" ]; then
+    pai_info "Using custom ignore rules from .paiignore"
+    while IFS= read -r line || [[ -n "$line" ]]; do
+      # Skip empty lines and comments
+      if [ -z "$line" ] || [[ "$line" == \#* ]]; then
+        continue
+      fi
+      find_excludes="$find_excludes -not -path \"*/$line/*\""
+    done < "$ignore_file"
+  else
+    pai_info "No .paiignore file found, using default ignores only"
+  fi
+  
+  # Get list of code files using find with excludes
+  local code_files
+  code_files=$(eval "find \"$current_dir\" -type f -not -path \"*/\\.*\" $find_excludes" | grep -E '\.(php|js|jsx|ts|tsx|vue|py|java|rb|go|c|cpp|h|hpp|cs|css|scss|sass|less|html|htm|xml|json|yaml|yml|md|sh|bash|pl|pm|swift|kt|kts|rs|sql)$')
+
+  # Count total lines in all code files
+  if [ -n "$code_files" ]; then
+    # Only count lines in files, not directories
+    total_lines=$(echo "$code_files" | xargs -I{} sh -c '[ -f "{}" ] && [ ! -d "{}" ] && echo "{}"' | xargs wc -l 2>/dev/null | tail -n 1 | awk '{print $1}')
+    if [ -z "$total_lines" ] || [[ "$total_lines" == *"cannot open"* ]]; then
+      total_lines=0
+    fi
+  fi
+  
+  # Count AI-generated code lines (including inline and block comments)
+  if [ -n "$code_files" ]; then
+    # First find files containing REF-PR references - use a safer approach
+    local ai_files=$(echo "$code_files" | xargs -d'\n' grep -l "REF-PR-" 2>/dev/null || echo "")
+    
+    # Initialize AI lines counter
+    ai_lines=0
+    
+    # Count references and blocks in each file
+    if [ -n "$ai_files" ]; then
+      while IFS= read -r file; do
+        if [ -f "$file" ]; then
+          # Get file extension
+          local file_ext="${file##*.}"
+          
+          # Special handling for PHP files
+          if [ "$file_ext" == "php" ]; then
+            # For PHP files, use a method less prone to syntax errors
+            # Read the file line by line directly without using cat
+            local ref_count=0
+            local block_count=0
+            local start_line=0
+            local line_num=1
+            
+            # Process the file safely line by line
+            while IFS= read -r line; do
+              # Count REF-PR references
+              if [[ "$line" == *"REF-PR-"* ]]; then
+                ((ref_count++))
+              fi
+              
+              # Track block start/end
+              if [[ "$line" == *"REF-PR-"*"-START"* ]]; then
+                start_line=$line_num
+              elif [[ "$line" == *"REF-PR-"*"-END"* ]] && [ $start_line -gt 0 ]; then
+                # Calculate lines between tags (excluding the tags)
+                local block_size=$((line_num - start_line - 1))
+                if [ $block_size -gt 0 ]; then
+                  block_count=$((block_count + block_size))
+                fi
+                start_line=0
+              fi
+              ((line_num++))
+            done < "$file"
+            
+            # Ensure variables are integers
+            ref_count=${ref_count:-0}
+            block_count=${block_count:-0}
+            
+            # Add the counts but don't double-count start/end tags
+            # (they are already counted in ref_count)
+            local tag_count=$(grep -c "REF-PR-.*-\\(START\\|END\\)" "$file" 2>/dev/null || echo 0)
+            tag_count=${tag_count:-0}
+            
+            # Calculate final count (add block lines but avoid double counting tags)
+            if [ $ref_count -gt 0 ]; then
+              # Remove start/end tags from total reference count
+              ai_lines=$((ai_lines + ref_count))
+              # Add block lines (we've already counted tags)
+              ai_lines=$((ai_lines + block_count))
+            else
+              # No references found
+              ai_lines=$((ai_lines))
+            fi
+          else
+            # Regular approach for other files
+            # Count REF-PR references
+            local ref_count=$(grep -c "REF-PR-" "$file" 2>/dev/null || echo 0)
+            ref_count=${ref_count:-0}
+            ai_lines=$((ai_lines + ref_count))
+            
+            # Count lines between START and END markers
+            local in_block=0
+            local block_count=0
+            
+            while IFS= read -r line; do
+              if [[ "$line" == *"REF-PR-"*"-START"* ]]; then
+                in_block=1
+              elif [[ "$line" == *"REF-PR-"*"-END"* ]]; then
+                in_block=0
+              elif [ $in_block -eq 1 ]; then
+                ((block_count++))
+              fi
+            done < "$file"
+            
+            # Add block lines
+            if [ $block_count -gt 0 ]; then
+              ai_lines=$((ai_lines + block_count))
+            fi
+          fi
+        fi
+      done < <(printf '%s\n' "$ai_files")
+    fi
+  fi
+  
+  # Ensure numeric values for calculation
+  total_lines=$(echo "$total_lines" | tr -cd '0-9')
+  ai_lines=$(echo "$ai_lines" | tr -cd '0-9')
+  
+  # Default values if empty
+  if [ -z "$total_lines" ]; then
+    total_lines=0
+  fi
+  
+  if [ -z "$ai_lines" ]; then
+    ai_lines=0
+  fi
+  
+  # Calculate percentage
+  if [ "$total_lines" -gt 0 ]; then
+    # Ensure bc is available, otherwise use awk
+    if command -v bc >/dev/null 2>&1; then
+      percentage=$(echo "scale=2; ($ai_lines * 100) / $total_lines" | bc 2>/dev/null)
+      # Check if percentage calculation failed
+      if [ -z "$percentage" ]; then
+        percentage=$(awk "BEGIN {printf \"%.2f\", ($ai_lines * 100) / $total_lines}")
+      fi
+    else
+      percentage=$(awk "BEGIN {printf \"%.2f\", ($ai_lines * 100) / $total_lines}")
+    fi
+  else
+    percentage="0.00"
+  fi
+  
+  # Ensure we have a valid percentage
+  if [ -z "$percentage" ] || [[ "$percentage" == *"error"* ]]; then
+    percentage="0.00"
+  fi
+  
+  # Display results with formatting
+  echo "╔═════════════════════════════════════════════════╗"
+  echo "║           Project Code Statistics               ║"
+  echo "╚═════════════════════════════════════════════════╝"
+  echo ""
+  echo "  Total lines of code: $total_lines"
+  echo "  AI-generated lines:  $ai_lines"
+  echo "  AI code percentage:  $percentage%"
+  echo ""
+  
+  return 0
+}
+
+# Execute main function if script is run directly
 if [ $sourced -eq 0 ]; then
-  # When run directly, exit with the return value
+  # Execute the main function with all command line arguments
   pai_main "$@"
   exit $?
 fi
@@ -848,4 +1079,5 @@ if [ $sourced -eq 1 ]; then
   export -f pai_main
 fi
 
-} # End of PAI shell script
+# End of PAI shell script wrapper
+}

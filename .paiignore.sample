@@ -1,0 +1,30 @@
+# PAI Statistics Ignore File
+# List directories and files to ignore when calculating project statistics
+# Each line is a pattern passed to find command's -not -path option
+# Comments (lines starting with #) and empty lines are ignored
+
+# Framework directories (these are already ignored by default)
+node_modules
+vendor
+.git
+storage/framework
+bootstrap/cache
+public/storage
+public/build
+public/hot
+dist
+build
+.next
+.nuxt
+_output
+bin
+obj
+target
+.cursor
+example
+docs
+
+# Add your custom ignore patterns below:
+# example: logs
+# example: data/large-files
+# example: generated/*.js 

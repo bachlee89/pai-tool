@@ -1,0 +1,88 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+## Overview
+This document defines the commenting standards for code generated with assistance from development tools in our project. Following these standards ensures proper documentation, maintainability, and tracking of code contributions.
+
+## Reference Tag Format
+All assisted code implementations must include a reference tag in the following format:
+
+```
+/* REF-PR-[TYPE]-[ID]: [Brief description from TASKS.md] */
+```
+
+### Tag Components
+- **REF-PR**: Standard project reference prefix
+- **[TYPE]**: Type classifier (see Types section)
+- **[ID]**: Task identifier from docs/planing/TASKS.md
+- **[Brief description]**: Short summary of the implemented task
+
+## Type Classifiers
+Use the following type classifiers to categorize the implementation:
+
+| Classifier | Description                          | Example                                      |
+|------------|--------------------------------------|----------------------------------------------|
+| DB         | Database-related implementations     | `REF-PR-DB-142`                             |
+| API        | API endpoints or services            | `REF-PR-API-V2-087`                         |
+| UI         | User interface components            | `REF-PR-UI-214`                             |
+| AUTH       | Authentication/authorization         | `REF-PR-AUTH-063`                           |
+| PERF       | Performance optimizations            | `REF-PR-PERF-118`                           |
+| SEC        | Security implementations             | `REF-PR-SEC-092`                            |
+| TEST       | Test implementations                 | `REF-PR-TEST-143`                           |
+| UTIL       | Utility functions                    | `REF-PR-UTIL-075`                           |
+| FIX        | Bug fixes                            | `REF-PR-FIX-219`                            |
+| REFAC      | Code refactoring                     | `REF-PR-REFAC-108`                          |
+
+## Additional Formats
+You can extend the base format with these optional modifiers:
+
+### Sprint Reference
+```
+/* REF-PR-UI-S14-27: Navigation menu implementation (Sprint 14) */
+```
+
+### Priority Level
+```
+/* REF-PR-SEC-P1-056: Critical vulnerability patch */
+```
+
+### Component Specification
+```
+/* REF-PR-COMP-NAV-067: Navigation bar state management */
+```
+
+### Date Stamp
+```
+/* REF-PR-20250521-FIX-34: Form validation bug fix */
+```
+
+## Block Demarcation
+When implementing larger sections of code, use start and end markers:
+
+```
+/* REF-PR-UI-214-START: Modal dialog implementation */
+// Code implementation here
+/* REF-PR-UI-214-END */
+```
+
+## Integration with TASKS.md
+All reference IDs must correspond to tasks defined in TASKS.md. Tasks should follow this format:
+
+```
+## [ID]: [Task Title]
+- **Type**: [Type Classifier]
+- **Priority**: [Priority Level]
+- **Description**: [Detailed description]
+- **Acceptance Criteria**: [List of requirements]
+```
+
+## Compliance
+- All assisted implementations must include appropriate reference tags
+- Reference tags should be placed at the beginning of the implementation
+- Block demarcation should be used for implementations spanning more than 10 lines
+- The description in the reference tag should match or summarize the task description from TASKS.md
+
+## Tracking
+Quarterly audits will be conducted to ensure compliance with these standards. Our code review process includes verification of proper reference tag implementation.

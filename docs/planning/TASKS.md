@@ -93,3 +93,13 @@
   - [x] Add help text for the uninstall command
   - [x] Update documentation
 
+### Command: `pai statistics`
+- [x] Implement code statistics analysis:
+  - [x] Count total lines of code in the project
+  - [x] Count AI-generated code lines (using REF-PR-* references)
+  - [x] Calculate and display AI code percentage
+  - [x] Create .paiignore.sample for custom ignore patterns
+  - [x] Automatically ignore common framework directories
+  - [x] Add help text for the statistics command
+  - [x] Update command handling in the main script
+
